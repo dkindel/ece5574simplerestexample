@@ -128,7 +128,7 @@ def update_robot(r_id):
             abort(400)
         #check to make sure they're all ints
         for sensor_id in data['sensors']:
-            if type(data['id']) is not int:
+            if 'id' not in sensor_id or type(sensor_id['id']) is not int:
                 abort(400)
         #We replace the ENTIRE list, not just add sensors
         del robot[0]['sensors'][:]
