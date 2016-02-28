@@ -10,7 +10,15 @@ robots = [
         'room': 1, 
         'attacker': False, 
         'status': 1, 
-        'movement': 1
+        'movement': 1,
+        'sensors':[
+            {
+                "ref": "/api/sensors/1"
+            },
+            {
+                "ref": "/api/sensors/2"
+            }
+        ]
     },
     {
         'id': 2,
@@ -18,7 +26,9 @@ robots = [
         'room': 2, 
         'attacker': True, 
         'status': 1, 
-        'movement': 1
+        'movement': 1,
+        'sensors':[
+        ]
     }
 ]
 
@@ -112,6 +122,22 @@ def update_robot(r_id):
             abort(400)
         else:
             robot[0]['status'] = data['status']
+
+    if 'sensors' in data:
+        if not isinstance(data['sensors'], list):
+            abort(400)
+        #check to make sure they're all ints
+        for sensor_id in data['sensors']:
+            if type(data['id']) is not int:
+                abort(400)
+        #We replace the ENTIRE list, not just add sensors
+        del robot[0]['sensors'][:]
+        for sensor_id in data['sensors']:
+            new_sensor = {
+                    "ref": "/api/sensors/"+str(sensor_id['id'])
+            }
+            robot[0]['sensors'].append(new_sensor)
+
     return jsonify({'robot': robot[0]})
 
 @app.route('/api/robots/<int:r_id>', methods=['DELETE'])
