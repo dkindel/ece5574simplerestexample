@@ -44,6 +44,59 @@ robots = [
     }
 ]
 
+def set_robot(robot):
+    data = request.get_json()
+    if not data:
+        abort(400)
+    if 'floor' in data:
+        if type(data['floor']) is not int:
+            abort(400)
+        else:
+            robot['floor'] = data['floor']
+
+    if 'room' in data:
+        if type(data['room']) is not int:
+            abort(400)
+        else:
+            robot['room'] = data['room']
+
+    if 'attacker' in data:
+        if type(data['attacker']) is not bool:
+            abort(400)
+        else:
+            robot['attacker'] = data['attacker']
+
+    if 'status' in data:
+        if type(data['status']) is not int:
+            abort(400)
+        else:
+            robot['status'] = data['status']
+
+    if 'sensors' in data:
+        if not isinstance(data['sensors'], list):
+            abort(400)
+        #check to make sure they're all ints
+        for sensor_id in data['sensors']:
+            if 'id' not in sensor_id or type(sensor_id['id']) is not int:
+                abort(400)
+        #We replace the ENTIRE list, not just add sensors
+        del robot['sensors'][:]
+        for sensor_id in data['sensors']:
+            new_sensor = {
+                    "id": sensor_id['id'],
+                    "ref": "/api/sensors/"+str(sensor_id['id'])
+            }
+            robot['sensors'].append(new_sensor)
+
+    if 'building' in data:
+        if "id" not in data['building'] or type(data['building']['id']) is not int:
+            abort(400)
+        new_bldg = {
+                "id": data['building']['id'],
+                "ref": "/api/buildings/" + str(data['building']['id'])
+        }
+        robot['building'] = new_bldg
+
 @app.route('/', methods=['GET'])
 def get_home():
     return "To access the API, navigate to /api/robots"
@@ -154,6 +207,7 @@ def create_robot():
                     'ref': '/api/buildings/1'
                 }
     	}
+    set_robot(newbot)
     robots.append(newbot)
     return jsonify({'robot': newbot}), 201
 
@@ -162,59 +216,9 @@ def update_robot(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
         abort(404)
-    data = request.get_json()
-    if not data:
-        abort(400)
-    if 'floor' in data:
-        if type(data['floor']) is not int:
-            abort(400)
-        else:
-            robot[0]['floor'] = data['floor']
-
-    if 'room' in data:
-        if type(data['room']) is not int:
-            abort(400)
-        else:
-            robot[0]['room'] = data['room']
-
-    if 'attacker' in data:
-        if type(data['attacker']) is not bool:
-            abort(400)
-        else:
-            robot[0]['attacker'] = data['attacker']
-
-    if 'status' in data:
-        if type(data['status']) is not int:
-            abort(400)
-        else:
-            robot[0]['status'] = data['status']
-
-    if 'sensors' in data:
-        if not isinstance(data['sensors'], list):
-            abort(400)
-        #check to make sure they're all ints
-        for sensor_id in data['sensors']:
-            if 'id' not in sensor_id or type(sensor_id['id']) is not int:
-                abort(400)
-        #We replace the ENTIRE list, not just add sensors
-        del robot[0]['sensors'][:]
-        for sensor_id in data['sensors']:
-            new_sensor = {
-                    "id": sensor_id['id'],
-                    "ref": "/api/sensors/"+str(sensor_id['id'])
-            }
-            robot[0]['sensors'].append(new_sensor)
-
-    if 'building' in data:
-        if "id" not in data['building'] or type(data['building']['id']) is not int:
-            abort(400)
-        new_bldg = {
-                "id": data['building']['id'],
-                "ref": "/api/buildings/" + str(data['building']['id'])
-        }
-        robot[0]['building'] = new_bldg
-
+    set_robot(robot[0])
     return jsonify({'robot': robot[0]})
+
 
 @app.route('/api/robots/<int:r_id>/', methods=['DELETE'])
 def delete_robot(r_id):
