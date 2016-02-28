@@ -13,12 +13,19 @@ robots = [
         'movement': 1,
         'sensors':[
             {
+                "id": 1,
                 "ref": "/api/sensors/1"
             },
             {
+                "id": 2,
                 "ref": "/api/sensors/2"
             }
-        ]
+        ],
+        'building': 
+        {
+            "id": "1",
+            "ref": "/api/building/1"
+        }
     },
     {
         'id': 2,
@@ -28,7 +35,12 @@ robots = [
         'status': 1, 
         'movement': 1,
         'sensors':[
-        ]
+        ],
+        'building': 
+        {
+            "id": 1,
+            "ref": "/api/building/1"
+        }
     }
 ]
 
@@ -77,7 +89,12 @@ def create_robot():
 		'room': 1, 
 		'attacker': False, 
 		'status': 1, 
-		'movement': 1
+		'movement': 1,
+                'sensors': [],
+                'building': {
+                    'id': 1,
+                    'ref': '/api/building/1'
+                }
     	}
     else:
     	newbot = {
@@ -86,7 +103,12 @@ def create_robot():
 		'room': 1, 
 		'attacker': False, 
 		'status': 1, 
-	'movement': 1
+	        'movement': 1,
+                'sensors': [],
+                'building': {
+                    'id': 1,
+                    'ref': '/api/building/1'
+                }
     	}
     robots.append(newbot)
     return jsonify({'robot': newbot}), 201
@@ -134,9 +156,19 @@ def update_robot(r_id):
         del robot[0]['sensors'][:]
         for sensor_id in data['sensors']:
             new_sensor = {
+                    "id": sensor_id['id'],
                     "ref": "/api/sensors/"+str(sensor_id['id'])
             }
             robot[0]['sensors'].append(new_sensor)
+
+    if 'building' in data:
+        if "id" not in data['building'] or type(data['building']['id']) is not int:
+            abort(400)
+        new_bldg = {
+                "id": data['building']['id'],
+                "ref": "/api/buildings/" + str(data['building']['id'])
+        }
+        robot[0]['building'] = new_bldg
 
     return jsonify({'robot': robot[0]})
 
