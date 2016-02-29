@@ -25,8 +25,8 @@ robots = [
             {
                 "id": "1",
                 "ref": "/api/buildings/1/"
-                }
-            'ref': "/api/robots/1/"
+                },
+            "ref": "/api/robots/1/"
             },
         {
             'id': 2,
@@ -41,8 +41,8 @@ robots = [
             {
                 "id": 1,
                 "ref": "/api/buildings/1/"
-                }
-            'ref': "/api/robots/2/"
+                },
+            "ref": "/api/robots/2/"
             }
         ]
 
@@ -288,7 +288,7 @@ def create_robot():
                 'building': {
                     'id': 1,
                     'ref': '/api/buildings/1/'
-                    }
+                    },
                 'ref': "/api/robots/1/"
                 }
     else:
@@ -303,7 +303,7 @@ def create_robot():
                 'building': {
                     'id': 1,
                     'ref': '/api/buildings/1/'
-                    }
+                    },
                 'ref': "/api/robots/"+str(robots[-1]['id'])+"/"
                 }
         set_robot(newbot)
