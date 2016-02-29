@@ -113,12 +113,44 @@ def get_robot(r_id):
         abort(404, "Could not find the robot with the provided id")
     return jsonify({'robot': robot[0]})
 
+
+def set_robot_attribute_int(attr, robot):
+    data = request.get_json()
+    if len(robot) == 0:
+        abort(404, "Could not find the robot with the provided id")
+    if not data:
+        abort(404, "Could not read the message body")
+    if attr not in data:
+        abort(404, "Could not find " + attr + " in the body of the request.")
+    if type(data[attr]) is not int:
+        abort(404, "\'" + attr + "\' is not an integer.")
+    robot[0][attr] = data[attr]
+
+def set_robot_attribute_bool(attr, robot):
+    data = request.get_json()
+    if len(robot) == 0:
+        abort(404, "Could not find the robot with the provided id")
+    if not data:
+        abort(404, "Could not read the message body")
+    if attr not in data:
+        abort(404, "Could not find " + attr + " in the body of the request.")
+    if type(data[attr]) is not bool:
+        abort(404, "\'" + attr + "\' is not a a bool.")
+    robot[0][attr] = data[attr]
+
 @app.route('/api/robots/<int:r_id>/status/', methods=['GET'])
 def get_robot_status(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
         abort(404, "Could not find the robot with the provided id")
     return jsonify({'status': robot[0]['status']})
+
+@app.route('/api/robots/<int:r_id>/status/', methods=['PUT'])
+def set_robot_status(r_id):
+    robot = [robot for robot in robots if robot['id'] == r_id]
+    set_robot_attribute_int('status', robot)
+    return jsonify({'status': robot[0]['status']})
+
 
 @app.route('/api/robots/<int:r_id>/floor/', methods=['GET'])
 def get_robot_floor(r_id):
@@ -127,12 +159,42 @@ def get_robot_floor(r_id):
         abort(404, "Could not find the robot with the provided id")
     return jsonify({'floor': robot[0]['floor']})
 
+@app.route('/api/robots/<int:r_id>/floor/', methods=['PUT'])
+def set_robot_floor(r_id):
+    robot = [robot for robot in robots if robot['id'] == r_id]
+    set_robot_attribute_int('floor', robot)
+    return jsonify({'floor': robot[0]['floor']})
+
+
 @app.route('/api/robots/<int:r_id>/room/', methods=['GET'])
 def get_robot_room(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
         abort(404, "Could not find the robot with the provided id")
     return jsonify({'room': robot[0]['room']})
+
+@app.route('/api/robots/<int:r_id>/room/', methods=['PUT'])
+def set_robot_room(r_id):
+    robot = [robot for robot in robots if robot['id'] == r_id]
+    set_robot_attribute_int('room', robot)
+    return jsonify({'room': robot[0]['room']})
+
+
+
+@app.route('/api/robots/<int:r_id>/attacker/', methods=['GET'])
+def get_robot_attacker(r_id):
+    robot = [robot for robot in robots if robot['id'] == r_id]
+    if len(robot) == 0:
+        abort(404, "Could not find the robot with the provided id")
+    return jsonify({'attacker': robot[0]['attacker']})
+
+@app.route('/api/robots/<int:r_id>/attacker/', methods=['PUT'])
+def set_robot_attacker(r_id):
+    robot = [robot for robot in robots if robot['id'] == r_id]
+    set_robot_attribute_bool('attacker', robot)
+
+    return jsonify({'attacker': robot[0]['attacker']})
+
 
 
 @app.route('/api/robots/<int:r_id>/building/', methods=['GET'])
@@ -197,6 +259,7 @@ def add_sensor(r_id):
     if len(robot) == 0:
         abort(404, "Could not find the provided id in the body")
     sensors = robot[0]['sensors']
+    data = request.get_json()
     if not data or 'id' not in data or type(data['id']) is not int:
         abort(400, "Could not find \"id\" in the body")
 
@@ -276,12 +339,6 @@ def custom404(error):
 def custom400(error):
     response = jsonify({'message': error.description})
     response.status_code = 400
-    return response
-
-@app.errorhandler(500)
-def custom500(error):
-    response = jsonify({'message': error.description})
-    response.status_code = 500
     return response
 
 @app.errorhandler(415)
