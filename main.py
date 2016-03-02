@@ -1,7 +1,11 @@
 #!flask/bin/python
 from flask import Flask, jsonify, abort, request, redirect
+from flask.ext.autodoc import Autodoc
 
 app = Flask(__name__)
+#app.debug = True
+auto = Autodoc(app)
+
 
 robots = [
         {
@@ -101,14 +105,19 @@ def set_robot(robot):
 
 @app.route('/', methods=['GET'])
 @app.route('/api/', methods=['GET'])
+@auto.doc()
 def get_home():
+    """Default API path"""
     return "To access the API, navigate to /api/robots"
 
 @app.route('/api/robots/', methods=['GET'])
+@auto.doc()
 def get_robots():
+    """Get all robots"""
     return jsonify({'robots': robots})
 
 @app.route('/api/robots/<int:r_id>/', methods=['GET'])
+@auto.doc()
 def get_robot(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
@@ -141,6 +150,7 @@ def set_robot_attribute_bool(attr, robot):
     robot[0][attr] = data[attr]
 
 @app.route('/api/robots/<int:r_id>/status/', methods=['GET'])
+@auto.doc()
 def get_robot_status(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
@@ -148,6 +158,7 @@ def get_robot_status(r_id):
     return jsonify({'status': robot[0]['status']})
 
 @app.route('/api/robots/<int:r_id>/status/', methods=['PUT'])
+@auto.doc()
 def set_robot_status(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     set_robot_attribute_int('status', robot)
@@ -155,6 +166,7 @@ def set_robot_status(r_id):
 
 
 @app.route('/api/robots/<int:r_id>/floor/', methods=['GET'])
+@auto.doc()
 def get_robot_floor(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
@@ -162,6 +174,7 @@ def get_robot_floor(r_id):
     return jsonify({'floor': robot[0]['floor']})
 
 @app.route('/api/robots/<int:r_id>/floor/', methods=['PUT'])
+@auto.doc()
 def set_robot_floor(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     set_robot_attribute_int('floor', robot)
@@ -169,6 +182,7 @@ def set_robot_floor(r_id):
 
 
 @app.route('/api/robots/<int:r_id>/room/', methods=['GET'])
+@auto.doc()
 def get_robot_room(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
@@ -176,6 +190,7 @@ def get_robot_room(r_id):
     return jsonify({'room': robot[0]['room']})
 
 @app.route('/api/robots/<int:r_id>/room/', methods=['PUT'])
+@auto.doc()
 def set_robot_room(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     set_robot_attribute_int('room', robot)
@@ -184,6 +199,7 @@ def set_robot_room(r_id):
 
 
 @app.route('/api/robots/<int:r_id>/attacker/', methods=['GET'])
+@auto.doc()
 def get_robot_attacker(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
@@ -191,6 +207,7 @@ def get_robot_attacker(r_id):
     return jsonify({'attacker': robot[0]['attacker']})
 
 @app.route('/api/robots/<int:r_id>/attacker/', methods=['PUT'])
+@auto.doc()
 def set_robot_attacker(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     set_robot_attribute_bool('attacker', robot)
@@ -200,6 +217,7 @@ def set_robot_attacker(r_id):
 
 
 @app.route('/api/robots/<int:r_id>/building/', methods=['GET'])
+@auto.doc()
 def get_robot_building(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
@@ -207,12 +225,14 @@ def get_robot_building(r_id):
     return redirect(robot[0]['building']['ref'])
 
 @app.route('/api/buildings/<int:bldg_id>/', methods=['GET'])
+@auto.doc()
 def get_buidling(bldg_id):
     #We shouldn't care about building json stuff since that's out of our purview
     return "This is where the building json stuff for " +str(bldg_id) + " will go!"
 
 
 @app.route('/api/robots/<int:r_id>/sensors/', methods=['GET'])
+@auto.doc()
 def get_robot_sensors(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
@@ -221,6 +241,7 @@ def get_robot_sensors(r_id):
 
 
 @app.route('/api/robots/<int:r_id>/sensors/<int:snsr_id>/', methods=['GET'])
+@auto.doc()
 def get_robot_sensor(r_id, snsr_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
@@ -234,12 +255,14 @@ def get_robot_sensor(r_id, snsr_id):
     return redirect(sensor[0]['ref'])
 
 @app.route('/api/sensors/<int:snsr_id>/', methods=['GET'])
+@auto.doc()
 def get_sensor(snsr_id):
     #We shouldn't care about sensor json stuff since that's out of our purview
     return "This is where the sensor json stuff for " +str(snsr_id) + " will go!"
 
 
 @app.route('/api/robots/<int:r_id>/sensors/<int:snsr_id>/', methods=['DELETE'])
+@auto.doc()
 def remove_sensor(r_id, snsr_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
@@ -256,6 +279,7 @@ def remove_sensor(r_id, snsr_id):
 
 #Add a sensor with POST - keeps other sensors added intact
 @app.route('/api/robots/<int:r_id>/sensors/', methods=['POST'])
+@auto.doc()
 def add_sensor(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
@@ -275,6 +299,7 @@ def add_sensor(r_id):
 
 
 @app.route('/api/robots/', methods=['POST'])
+@auto.doc()
 def create_robot():
     if len(robots) == 0:
         newbot = {
@@ -311,6 +336,7 @@ def create_robot():
     return jsonify({'robot': newbot}), 201
 
 @app.route('/api/robots/<int:r_id>/', methods=['PUT'])
+@auto.doc()
 def update_robot(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
@@ -320,6 +346,7 @@ def update_robot(r_id):
 
 
 @app.route('/api/robots/<int:r_id>/', methods=['DELETE'])
+@auto.doc()
 def delete_robot(r_id):
     robot = [robot for robot in robots if robot['id'] == r_id]
     if len(robot) == 0:
@@ -328,9 +355,14 @@ def delete_robot(r_id):
     return jsonify({'result': True})
 
 @app.route('/api/robots/', methods=['DELETE'])
+@auto.doc()
 def delete_robots():
     robots.remove(robot[:])
     return jsonify({'result': True})
+
+@app.route('/documentation')
+def documentation():
+    return auto.html();
 
 
 @app.errorhandler(404)
