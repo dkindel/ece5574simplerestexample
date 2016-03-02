@@ -61,6 +61,12 @@ def set_robot(robot):
             abort(400, "\'room\' isn't an integer")
         else:
             robot['room'] = data['room']
+    
+    if 'movement' in data:
+        if type(data['movement']) is not int:
+            abort(400, "\'movement\' isn't an integer")
+        else:
+            robot['movement'] = data['movement']
 
     if 'attacker' in data:
         if type(data['attacker']) is not bool:
@@ -181,6 +187,19 @@ def set_robot_room(r_id):
     set_robot_attribute_int('room', robot)
     return jsonify({'room': robot[0]['room']})
 
+@app.route('/api/robots/<int:r_id>/movement/', methods=['GET'])
+def get_robot_movement(r_id):
+    robot = [robot for robot in robots if robot['id'] == r_id]
+    if len(robot) == 0:
+        abort(404, "Could not find the robot with the provided id")
+    return jsonify({'movement': robot[0]['movement']})
+
+@app.route('/api/robots/<int:r_id>/movement/', methods=['PUT'])
+def set_robot_movement(r_id):
+    robot = [robot for robot in robots if robot['id'] == r_id]
+    set_robot_attribute_int('movement', robot)
+    print "here"
+    return jsonify({'movement': robot[0]['movement']})
 
 
 @app.route('/api/robots/<int:r_id>/attacker/', methods=['GET'])
